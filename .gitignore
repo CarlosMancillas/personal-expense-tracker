@@ -1,0 +1,19 @@
+# Ignore the virtual environment
+venv/
+.venv/
+ENV/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore local databases (we will generate these locally)
+*.db
+*.sqlite3
+
+# Ignore OS specific files
+.DS_Store
+Thumbs.db
+
+# Ignore activate_venv.txt files 
+activate_venv.txt
