@@ -15,5 +15,9 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Ignore activate_venv.txt files 
+# Ignore .txt files 
 activate_venv.txt
+responsability_of_each_module.txt
+
+# Ignore the diagram direcotry
+diagrams/

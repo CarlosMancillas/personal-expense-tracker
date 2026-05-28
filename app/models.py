@@ -6,6 +6,11 @@ from typing import List
 from flask_login import UserMixin
 
 from app import db
+from app import login_manager
+
+@login_manager.user_loader
+def load_user(user_id: str) -> User | None:
+    return User.query.get(int(user_id))
 
 
 class User(UserMixin, db.Model):
