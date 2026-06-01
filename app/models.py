@@ -5,8 +5,8 @@ from typing import List
 
 from flask_login import UserMixin
 
-from app import db
-from app import login_manager
+from . import db
+from . import login_manager
 
 @login_manager.user_loader
 def load_user(user_id: str) -> User | None:
@@ -14,22 +14,27 @@ def load_user(user_id: str) -> User | None:
 
 
 class User(UserMixin, db.Model):
+    #__allow_unmapped__ = True
+
     __tablename__: str = "user"
 
-    id: int = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer, 
+        primary_key=True
+    )
 
-    username: str = db.Column(
+    username= db.Column(
         db.String(80),
         unique=True,
         nullable=False
     )
 
-    password: str = db.Column(
+    password = db.Column(
         db.String(200),
         nullable=False
     )
 
-    transactions: List[Transaction] = db.relationship(
+    transactions = db.relationship(
         "Transaction",
         backref="owner",
         lazy=True
@@ -40,39 +45,41 @@ class User(UserMixin, db.Model):
 
 
 class Transaction(db.Model):
+    #__allow_unmapped__ = True
+
     __tablename__: str = "transaction"
 
-    id: int = db.Column(
+    id = db.Column(
         db.Integer,
         primary_key=True
     )
 
-    title: str = db.Column(
+    title = db.Column(
         db.String(100),
         nullable=False
     )
 
-    amount: float = db.Column(
+    amount = db.Column(
         db.Float,
         nullable=False
     )
 
-    category: str = db.Column(
+    category = db.Column(
         db.String(50),
         nullable=False
     )
 
-    transaction_type: str = db.Column(
+    transaction_type = db.Column(
         db.String(20),
         nullable=False
     )
 
-    created_at: datetime = db.Column(
+    created_at = db.Column(
         db.DateTime,
         default=datetime.utcnow
     )
 
-    user_id: int = db.Column(
+    user_id = db.Column(
         db.Integer,
         db.ForeignKey("user.id"),
         nullable=False
