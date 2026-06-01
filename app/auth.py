@@ -17,6 +17,7 @@ from werkzeug.security import (
 from . import db
 from .models import User
 
+from flask_login import login_user
 
 auth: Blueprint = Blueprint(
     "auth",
@@ -56,3 +57,34 @@ def register() -> str:
         return redirect(url_for("main.home"))
 
     return render_template("register.html")
+
+
+@auth.route("/login", methods=["GET", "POST"])
+def login() -> str:
+
+    if request.method == "POST":
+
+        username: str = request.form["username"]
+
+        password: str = request.form["password"]
+
+        user: User | None = User.query.filter_by(
+            username=username
+        ).first()
+
+        if user and check_password_hash(
+            user.password,
+            password
+        ):
+
+            login_user(user)
+
+            flash("Login successful.")
+
+            return redirect(
+                url_for("main.home")
+            )
+
+        flash("Invalid username or password.")
+
+    return render_template("login.html")
