@@ -17,7 +17,10 @@ from werkzeug.security import (
 from . import db
 from .models import User
 
-from flask_login import login_user
+from flask_login import (
+    login_user,
+    logout_user
+) 
 
 auth: Blueprint = Blueprint(
     "auth",
@@ -88,3 +91,14 @@ def login() -> str:
         flash("Invalid username or password.")
 
     return render_template("login.html")
+
+@auth.route("/logout")
+def logout() -> str:
+
+    logout_user()
+
+    flash("You have been logged out.")
+
+    return redirect(
+        url_for("main.home")
+    )
