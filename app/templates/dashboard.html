@@ -5,13 +5,41 @@
 </head>
 <body>
 
-<a href="{{ url_for('main.transactions') }}">
-    View Transactions
-</a>
+    <h1>Dashboard</h1>
 
-<a href="{{ url_for('main.add_transaction') }}">
-    Add Transaction
-</a>
+    <h2>Financial Summary</h2>
+
+    <p>
+        Total Income:
+        ${{ total_income }}
+    </p>
+
+    <p>
+        Total Expenses:
+        ${{ total_expenses }}
+    </p>
+
+    <p>
+        Current Balance:
+        ${{ balance }}
+    </p>
+
+    <p>
+        Total Transactions:
+        {{ transaction_count }}
+    </p>
+
+    <hr>
+
+    <a href="{{ url_for('main.add_transaction') }}">
+        Add Transaction
+    </a>
+
+    <br><br>
+
+    <a href="{{ url_for('main.transactions') }}">
+        View Transactions
+    </a>
 
 </body>
 </html>

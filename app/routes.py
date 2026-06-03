@@ -37,10 +37,40 @@ def home() -> str:
 @main.route("/dashboard")
 @login_required
 def dashboard() -> str:
-        return render_template(
-        "dashboard.html"
+
+    transactions: list[Transaction] = (
+        Transaction.query.filter_by(
+            user_id=current_user.id
+        ).all()
     )
-    #return f"Welcome to your dashboard, {current_user.username}"
+
+    total_income: float = sum(
+        transaction.amount
+        for transaction in transactions
+        if transaction.transaction_type == "income"
+    )
+
+    total_expenses: float = sum(
+        transaction.amount
+        for transaction in transactions
+        if transaction.transaction_type == "expense"
+    )
+
+    balance: float = (
+        total_income - total_expenses
+    )
+
+    transaction_count: int = len(
+        transactions
+    )
+
+    return render_template(
+        "dashboard.html",
+        total_income=total_income,
+        total_expenses=total_expenses,
+        balance=balance,
+        transaction_count=transaction_count
+    )
 
 
 
