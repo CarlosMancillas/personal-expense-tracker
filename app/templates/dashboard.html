@@ -41,5 +41,64 @@
         View Transactions
     </a>
 
+    <hr>
+
+<h2>Monthly Summary</h2>
+
+    {% if monthly_rows %}
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Month</th>
+                    <th>Income</th>
+                    <th>Expenses</th>
+                    <th>Net</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in monthly_rows %}
+                <tr>
+                    <td>{{ row.month }}</td>
+                    <td>${{ "%.2f" | format(row.income) }}</td>
+                    <td>${{ "%.2f" | format(row.expense) }}</td>
+                    <td>${{ "%.2f" | format(row.net) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% else %}
+        <p>No transactions yet.</p>
+    {% endif %}
+
+    <hr>
+
+<h2>Spending by Category</h2>
+
+{% if category_rows %}
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Type</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in category_rows %}
+            <tr>
+                <td>{{ row.category }}</td>
+                <td>{{ row.transaction_type }}</td>
+                <td>${{ "%.2f" | format(row.amount) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% else %}
+    <p>No transactions yet.</p>
+{% endif %}
 </body>
 </html>

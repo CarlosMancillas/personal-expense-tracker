@@ -16,6 +16,7 @@ from flask_login import (
 
 from app import db
 from app.models import Transaction
+from app.analytics import AnalyticsService
 
 main: Blueprint = Blueprint(
     "main",
@@ -38,30 +39,48 @@ def home() -> str:
 @login_required
 def dashboard() -> str:
 
-    transactions: list[Transaction] = (
-        Transaction.query.filter_by(
-            user_id=current_user.id
-        ).all()
+    transactions = (
+        AnalyticsService.get_user_transactions(
+            current_user.id
+        )
     )
 
     total_income: float = sum(
-        transaction.amount
-        for transaction in transactions
-        if transaction.transaction_type == "income"
+        t.amount for t in transactions
+        if t.transaction_type == "income"
     )
 
     total_expenses: float = sum(
-        transaction.amount
-        for transaction in transactions
-        if transaction.transaction_type == "expense"
+        t.amount for t in transactions
+        if t.transaction_type == "expense"
     )
 
-    balance: float = (
-        total_income - total_expenses
+    balance: float = total_income - total_expenses
+
+    transaction_count: int = len(transactions)
+
+    monthly_summary = (
+        AnalyticsService.get_monthly_summary(
+            current_user.id
+        )
     )
 
-    transaction_count: int = len(
-        transactions
+    monthly_rows = (
+        monthly_summary.to_dict(orient="records")
+        if not monthly_summary.empty
+        else []
+    )
+
+    category_summary = (
+        AnalyticsService.get_category_summary(
+            current_user.id
+        )
+    )
+
+    category_rows = (
+        category_summary.to_dict(orient="records")
+        if not category_summary.empty
+        else []
     )
 
     return render_template(
@@ -69,10 +88,10 @@ def dashboard() -> str:
         total_income=total_income,
         total_expenses=total_expenses,
         balance=balance,
-        transaction_count=transaction_count
+        transaction_count=transaction_count,
+        monthly_rows=monthly_rows,
+        category_rows=category_rows
     )
-
-
 
 @main.route(
     "/transactions/add",

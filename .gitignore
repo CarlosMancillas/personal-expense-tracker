@@ -19,5 +19,5 @@ Thumbs.db
 activate_venv.txt
 responsability_of_each_module.txt
 
-# Ignore the diagram direcotry
+# Ignore directory
 diagrams/
