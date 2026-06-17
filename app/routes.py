@@ -83,6 +83,18 @@ def dashboard() -> str:
         else []
     )
 
+    insights: dict = AnalyticsService.get_insights(
+        current_user.id
+    )
+
+    monthly_chart: str = AnalyticsService.get_monthly_chart(
+        current_user.id
+    )
+
+    category_chart: str = AnalyticsService.get_category_chart(
+        current_user.id
+    )
+
     return render_template(
         "dashboard.html",
         total_income=total_income,
@@ -90,7 +102,10 @@ def dashboard() -> str:
         balance=balance,
         transaction_count=transaction_count,
         monthly_rows=monthly_rows,
-        category_rows=category_rows
+        category_rows=category_rows,
+        insights=insights,
+        monthly_chart=monthly_chart,
+        category_chart=category_chart
     )
 
 @main.route(

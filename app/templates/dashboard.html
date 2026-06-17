@@ -43,26 +43,55 @@
 
     <hr>
 
-<h2>Monthly Summary</h2>
+    <h2>Monthly Summary</h2>
 
-    {% if monthly_rows %}
+        {% if monthly_rows %}
+
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Income</th>
+                        <th>Expenses</th>
+                        <th>Net</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in monthly_rows %}
+                    <tr>
+                        <td>{{ row.month }}</td>
+                        <td>${{ "%.2f" | format(row.income) }}</td>
+                        <td>${{ "%.2f" | format(row.expense) }}</td>
+                        <td>${{ "%.2f" | format(row.net) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+            <p>No transactions yet.</p>
+        {% endif %}
+
+        <hr>
+
+    <h2>Spending by Category</h2>
+
+    {% if category_rows %}
 
         <table border="1">
             <thead>
                 <tr>
-                    <th>Month</th>
-                    <th>Income</th>
-                    <th>Expenses</th>
-                    <th>Net</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Total</th>
                 </tr>
             </thead>
             <tbody>
-                {% for row in monthly_rows %}
+                {% for row in category_rows %}
                 <tr>
-                    <td>{{ row.month }}</td>
-                    <td>${{ "%.2f" | format(row.income) }}</td>
-                    <td>${{ "%.2f" | format(row.expense) }}</td>
-                    <td>${{ "%.2f" | format(row.net) }}</td>
+                    <td>{{ row.category }}</td>
+                    <td>{{ row.transaction_type }}</td>
+                    <td>${{ "%.2f" | format(row.amount) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -74,31 +103,54 @@
 
     <hr>
 
-<h2>Spending by Category</h2>
+    <h2>Spending Insights</h2>
 
-{% if category_rows %}
+    {% if insights %}
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Category</th>
-                <th>Type</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in category_rows %}
-            <tr>
-                <td>{{ row.category }}</td>
-                <td>{{ row.transaction_type }}</td>
-                <td>${{ "%.2f" | format(row.amount) }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <p>
+            Top Spending Category:
+            <strong>{{ insights.top_category }}</strong>
+            (${{ "%.2f" | format(insights.top_category_total) }})
+        </p>
 
-{% else %}
-    <p>No transactions yet.</p>
-{% endif %}
+        <p>
+            Biggest Single Expense:
+            <strong>{{ insights.biggest_expense_title }}</strong>
+            (${{ "%.2f" | format(insights.biggest_expense_amount) }})
+        </p>
+
+        <p>
+            This Month's Spending:
+            ${{ "%.2f" | format(insights.current_month_spend) }}
+        </p>
+
+        <p>
+            Last Month's Spending:
+            ${{ "%.2f" | format(insights.previous_month_spend) }}
+        </p>
+
+        <p>
+            Month-over-Month Change:
+            ${{ "%.2f" | format(insights.mom_change) }}
+            ({{ insights.mom_change_pct }}%)
+        </p>
+
+    {% else %}
+        <p>No transactions yet.</p>
+    {% endif %}
+
+    <hr>
+
+    <h2>Charts</h2>
+
+    {% if monthly_chart %}
+        <h3>Monthly Income vs Expenses</h3>
+        <img src="{{ monthly_chart }}" alt="Monthly chart">
+    {% endif %}
+
+    {% if category_chart %}
+        <h3>Spending by Category</h3>
+        <img src="{{ category_chart }}" alt="Category chart">
+    {% endif %}
 </body>
 </html>

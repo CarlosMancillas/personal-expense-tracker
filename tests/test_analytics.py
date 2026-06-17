@@ -210,3 +210,157 @@ def test_category_summary_aggregates_same_category():
 
     assert len(summary) == 1
     assert summary.iloc[0]["amount"] == 65.0
+
+# ── get_insights ──────────────────────────────────────────────────────────────
+
+def test_insights_empty():
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: []
+    )
+    insights = AnalyticsService.get_insights(1)
+    assert insights == {}
+
+
+def test_insights_top_category():
+    transactions = [
+        make_transaction(1, "Rent",      800.0, "housing",
+                         "expense", datetime(2025, 5, 1)),
+        make_transaction(2, "Groceries", 200.0, "food",
+                         "expense", datetime(2025, 5, 10)),
+    ]
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: transactions
+    )
+    insights = AnalyticsService.get_insights(1)
+
+    assert insights["top_category"]       == "housing"
+    assert insights["top_category_total"] == 800.0
+
+
+def test_insights_biggest_expense():
+    transactions = [
+        make_transaction(1, "Rent",      800.0, "housing",
+                         "expense", datetime(2025, 5, 1)),
+        make_transaction(2, "Groceries", 200.0, "food",
+                         "expense", datetime(2025, 5, 10)),
+    ]
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: transactions
+    )
+    insights = AnalyticsService.get_insights(1)
+
+    assert insights["biggest_expense_title"]  == "Rent"
+    assert insights["biggest_expense_amount"] == 800.0
+
+
+def test_insights_mom_change_two_months():
+    transactions = [
+        make_transaction(1, "Rent",  800.0, "housing",
+                         "expense", datetime(2025, 4, 1)),
+        make_transaction(2, "Rent",  900.0, "housing",
+                         "expense", datetime(2025, 5, 1)),
+    ]
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: transactions
+    )
+    insights = AnalyticsService.get_insights(1)
+
+    assert insights["previous_month_spend"] == 800.0
+    assert insights["current_month_spend"]  == 900.0
+    assert insights["mom_change"]           == 100.0
+    assert insights["mom_change_pct"]       == 12.5
+
+
+def test_insights_mom_change_single_month():
+    """Only one month of data — previous spend must be 0, no crash."""
+    transactions = [
+        make_transaction(1, "Rent", 800.0, "housing",
+                         "expense", datetime(2025, 5, 1)),
+    ]
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: transactions
+    )
+    insights = AnalyticsService.get_insights(1)
+
+    assert insights["previous_month_spend"] == 0.0
+    assert insights["mom_change"]           == 0.0
+    assert insights["mom_change_pct"]       == 0.0
+
+
+def test_insights_ignores_income_for_expense_metrics():
+    """Income transactions must not affect expense-only insights."""
+    transactions = [
+        make_transaction(1, "Salary", 5000.0, "salary",
+                         "income",  datetime(2025, 5, 1)),
+        make_transaction(2, "Rent",    800.0, "housing",
+                         "expense", datetime(2025, 5, 1)),
+    ]
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: transactions
+    )
+    insights = AnalyticsService.get_insights(1)
+
+    assert insights["top_category"]          == "housing"
+    assert insights["biggest_expense_title"] == "Rent"
+
+# ── charts ───────────────────────────────────────────────────────────────────
+
+def test_monthly_chart_empty_returns_empty_string():
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: []
+    )
+    result = AnalyticsService.get_monthly_chart(1)
+    assert result == ""
+
+
+def test_monthly_chart_returns_base64_png():
+    transactions = [
+        make_transaction(1, "Salary", 1000.0, "salary",
+                         "income",  datetime(2025, 5, 1)),
+        make_transaction(2, "Rent",    400.0, "housing",
+                         "expense", datetime(2025, 5, 15)),
+    ]
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: transactions
+    )
+    result = AnalyticsService.get_monthly_chart(1)
+
+    assert result.startswith("data:image/png;base64,")
+    assert len(result) > 100
+
+
+def test_category_chart_empty_returns_empty_string():
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: []
+    )
+    result = AnalyticsService.get_category_chart(1)
+    assert result == ""
+
+
+def test_category_chart_no_expenses_returns_empty_string():
+    """Only income transactions — pie chart has nothing to show."""
+    transactions = [
+        make_transaction(1, "Salary", 1000.0, "salary",
+                         "income", datetime(2025, 5, 1)),
+    ]
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: transactions
+    )
+    result = AnalyticsService.get_category_chart(1)
+    assert result == ""
+
+
+def test_category_chart_returns_base64_png():
+    transactions = [
+        make_transaction(1, "Rent",      800.0, "housing",
+                         "expense", datetime(2025, 5, 1)),
+        make_transaction(2, "Groceries", 200.0, "food",
+                         "expense", datetime(2025, 5, 10)),
+    ]
+    AnalyticsService.get_user_transactions = staticmethod(
+        lambda uid: transactions
+    )
+    result = AnalyticsService.get_category_chart(1)
+
+    assert result.startswith("data:image/png;base64,")
+    assert len(result) > 100
