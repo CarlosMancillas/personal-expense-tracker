@@ -237,7 +237,7 @@ Phase 2 — Analytics
 
 ### Current Step
 
-Matplotlib Visualizations
+Analytics Dashboard
 
 ### Completed
 
@@ -287,10 +287,10 @@ Matplotlib Visualizations
 * Monthly Summary Analytics
 * Category Summary Analytics
 * Spending Insights
+* Matplotlib Visualizations (Monthly bar chart, Category pie chart, base64 embedding)
 
 ### Next Steps
 
-* Matplotlib Visualizations
 * Analytics Dashboard
 
 ---
@@ -299,7 +299,7 @@ Matplotlib Visualizations
 
 Operating System:
 
-Windows 11
+Windows 10
 
 Python Environment:
 
